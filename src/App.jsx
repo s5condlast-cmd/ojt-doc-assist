@@ -175,7 +175,7 @@ const INITIAL_REQUESTS = [
 const COORDINATORS = ["Prof. Santos", "Dr. Lim", "Prof. Reyes", "Dr. Bautista"];
 
 // ─── API ──────────────────────────────────────────────────────────────────────
-const API_BASE = "https://ojt-docassist-backend.onrender.com"; // Replace with your actual Render URL after deployment
+const API_BASE = "https://ojt-doc-assist.onrender.com"; // Use your actual Render URL
 
 async function callAI(prompt, system = "", onChunk) {
   // Try live server first, fallback to local
