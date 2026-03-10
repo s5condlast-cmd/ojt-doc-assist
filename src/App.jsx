@@ -388,7 +388,16 @@ function RoleSelect({ onSelect }) {
 // ─── TOP BAR ─────────────────────────────────────────────────────────────────
 function TopBar({ roleLabel, roleColor, notifications, setNotifications, onLogout }) {
   const [open, setOpen] = useState(false);
+  const [aiStatus, setAiStatus] = useState("checking");
   const unread = notifications.filter(n => !n.read).length;
+
+  useEffect(() => {
+    fetch(`${API_BASE}/health`)
+      .then(res => res.json())
+      .then(data => setAiStatus(data.status === "ok" ? "online" : "error"))
+      .catch(() => setAiStatus("offline"));
+  }, []);
+
   return (
     <div style={{ background: "#0f1118", borderBottom: "1px solid #1e2130", padding: "11px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -397,6 +406,12 @@ function TopBar({ roleLabel, roleColor, notifications, setNotifications, onLogou
         </div>
         <span style={{ fontWeight: 700, fontSize: 15, color: "#dde2f0" }}>OJT DocAssist</span>
         <span style={{ background: `${roleColor}18`, color: roleColor, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: .8 }}>{roleLabel}</span>
+        
+        {/* AI Status Badge */}
+        <div style={{ display: "flex", alignItems: "center", gap: 5, marginLeft: 8, padding: "2px 8px", background: "#1a1d2a", borderRadius: 12, border: "1px solid #252840" }}>
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: aiStatus === "online" ? "#2a9d8f" : aiStatus === "checking" ? "#e9c46a" : "#e74c3c" }} />
+          <span style={{ fontSize: 10, fontWeight: 700, color: "#6b7590", textTransform: "uppercase" }}>AI {aiStatus}</span>
+        </div>
       </div>
       <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
         <div style={{ position: "relative" }}>
