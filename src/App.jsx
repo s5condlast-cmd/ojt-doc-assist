@@ -175,11 +175,10 @@ const INITIAL_REQUESTS = [
 const COORDINATORS = ["Prof. Santos", "Dr. Lim", "Prof. Reyes", "Dr. Bautista"];
 
 // ─── API ──────────────────────────────────────────────────────────────────────
-const API_BASE = "https://ojt-doc-assist.onrender.com"; // Use your actual Render URL
+const API_BASE = "https://ojt-doc-assist.onrender.com"; 
 
 async function callAI(prompt, system = "", onChunk) {
-  // Try live server first, fallback to local
-  let url = `${API_BASE}/generate`;
+  const url = `${API_BASE}/generate`;
   try {
     const res = await fetch(url, {
       method: "POST",
@@ -188,29 +187,13 @@ async function callAI(prompt, system = "", onChunk) {
     });
     
     if (!res.ok) {
-      // If live fails, try local
-      url = "http://127.0.0.1:8000/generate";
-      const localRes = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ system: system || "You help process OJT document text.", prompt }),
-      });
-      if (!localRes.ok) throw new Error("AI server unavailable.");
-      return handleStream(localRes, onChunk);
+      const errData = await res.json().catch(() => ({ detail: "Unknown Error" }));
+      throw new Error(errData.detail || "AI server error");
     }
     return handleStream(res, onChunk);
   } catch (err) {
-    // Last resort fallback to local
-    try {
-      const localRes = await fetch("http://127.0.0.1:8000/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ system: system || "You help process OJT document text.", prompt }),
-      });
-      return handleStream(localRes, onChunk);
-    } catch (e) {
-      throw new Error("AI server unavailable. Please ensure either the live or local backend is running.");
-    }
+    console.error("AI Error:", err);
+    throw new Error(`AI unavailable: ${err.message}. Please check if the backend is live.`);
   }
 }
 
